@@ -40,6 +40,7 @@ function AddListingModal({ account, profile, location, theme, onClose, onPublish
   const [availability, setAvailability] = useState(editing && editing.availability && editing.availability !== "Contact for availability" ? editing.availability : "");
   const [subscriptions, setSubscriptions] = useState(editing ? !!editing.subscriptions : false);
   const [bundles, setBundles] = useState(editing ? !!editing.bundles : false);
+  const [farmstand, setFarmstand] = useState(editing ? !!editing.farmstand : false);
   const [nostrContact, setNostrContact] = useState(editing ? !!editing.nostrContact : false);
   const [pin, setPin] = useState(startPin);
   // location is set either by an exact pin or by choosing a whole city
@@ -146,7 +147,7 @@ function AddListingModal({ account, profile, location, theme, onClose, onPublish
     const base = {
       type, categories, title: title.trim(), content: content.trim(), items,
       city: town.city, county: town.county, state: town.state,
-      lat, lng, contact, meet, area: isCity, cityOnly: isCity, subscriptions, bundles, nostrContact,
+      lat, lng, contact, meet, area: isCity, cityOnly: isCity, subscriptions, bundles, farmstand: type === "product" ? farmstand : false, nostrContact,
       photo: photo || "",
       availability: availability.trim() || "Contact for availability",
       photoSeed: title + (categories[0] || ""),
@@ -229,6 +230,12 @@ function AddListingModal({ account, profile, location, theme, onClose, onPublish
                 <input type="checkbox" checked={bundles} onChange={(e) => setBundles(e.target.checked)} className="mt-0.5 h-4 w-4 accent-emerald-700" />
                 <span>Bundles available <span className={"block " + t.muted}>(buy as a set)</span></span>
               </label>
+              {type === "product" && (
+                <label className={"flex items-start gap-2.5 rounded-xl border px-3.5 py-3 text-sm cursor-pointer " + t.border + " " + t.text} style={FONT_BODY}>
+                  <input type="checkbox" checked={farmstand} onChange={(e) => setFarmstand(e.target.checked)} className="mt-0.5 h-4 w-4 accent-emerald-700" />
+                  <span>This is a farmstand <span className={"block " + t.muted}>(a stand selling what you grow/make)</span></span>
+                </label>
+              )}
             </div>
             <div className="flex justify-end"><PrimaryBtn icon={ArrowRight} disabled={!step1ok} onClick={() => setStep(2)}>Next: location</PrimaryBtn></div>
           </div>
@@ -236,7 +243,7 @@ function AddListingModal({ account, profile, location, theme, onClose, onPublish
 
         {step === 2 && (
           <div className="space-y-4">
-            <Banner tone="info">Choose <strong>Drop a pin</strong> for an exact spot, or <strong>Just a city</strong> to show up whenever someone is viewing that city on the map — no exact address needed.</Banner>
+            <Banner tone="info">Choose <strong>Drop a pin</strong> to click on an exact spot, or <strong>Just a city</strong> to show up whenever someone is viewing that city on the map — no exact address needed.</Banner>
             <div className="flex gap-2">
               {[["pin", "Drop a pin", "Exact spot on the map"], ["city", "Just a city", "Appears citywide"]].map(([id, label, sub]) => (
                 <button key={id} onClick={() => setLocMode(id)}

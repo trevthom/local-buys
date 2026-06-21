@@ -1,7 +1,7 @@
 /* Seller card.
    Part of LOCAL BUYS. Organized for easy editing — see README.md. */
 import React from "react";
-import { MapPin, Heart, Handshake } from "lucide-react";
+import { MapPin, Heart, Handshake, Sprout } from "lucide-react";
 import { catById } from "@/config";
 import { fmtMiles, photoArt, sellerCategories } from "@/lib/helpers";
 import { useTheme } from "@/theme/ThemeContext";
@@ -28,9 +28,19 @@ function SellerCard({ seller, distance, vouchCount = 0, isFav, onFav, onOpen, sh
             <Heart size={16} className={isFav ? "text-red-400" : "text-white"} fill={isFav ? "currentColor" : "none"} />
           </button>
         )}
+        {seller.farmstand && (
+          <div className="absolute left-2.5 top-2.5 inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-1 text-xs font-bold text-white shadow">
+            <Sprout size={11} /> Farmstand
+          </div>
+        )}
         {seller.area && (
           <div className="absolute bottom-2.5 left-2.5 inline-flex items-center gap-1 rounded-full bg-black/40 px-2 py-1 text-xs font-medium text-white backdrop-blur">
             <MapPin size={10} /> {seller.cityOnly ? "citywide" : "approx. area"}
+          </div>
+        )}
+        {seller.seed && (
+          <div className="absolute bottom-2.5 right-2.5 inline-flex items-center rounded-full bg-amber-500 px-2 py-1 text-xs font-bold text-white shadow">
+            Example listing
           </div>
         )}
       </div>

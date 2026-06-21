@@ -95,7 +95,7 @@ const SUGGESTIONS = {
 
 const SEED_SELLERS = [
 
-  { d: "sarahs-eggs", type: "product", category: "eggs", title: "Sarah's Backyard Eggs",
+  { d: "sarahs-eggs", type: "product", farmstand: true, category: "eggs", title: "Sarah's Backyard Eggs",
     content: "Pasture-raised hens, mixed-breed flock. Dozen eggs usually laid that morning. Occasionally duck eggs in spring. Return clean cartons and earn a free dozen on your fifth.",
     items: ["Brown eggs (dozen)", "Duck eggs (seasonal)", "Quail eggs (special order)"],
     city: "Lexington", county: "Fayette", state: "KY", lat: 38.0606, lng: -84.4837,
@@ -113,7 +113,7 @@ const SEED_SELLERS = [
     city: "Louisville", county: "Jefferson", state: "KY", lat: 38.2527, lng: -85.7385,
     contact: { phone: "(502) 555-0173", email: "cottage@example.com" }, meet: "pickup", area: true,
     availability: "Bake days: Fri & Sun · Pre-order by Thu", photoSeed: "sourdoughloaf3", verified: false },
-  { d: "hilltop-heirlooms", type: "product", category: "produce", title: "Hilltop Heirlooms",
+  { d: "hilltop-heirlooms", type: "product", farmstand: true, category: "produce", title: "Hilltop Heirlooms",
     content: "Backyard market garden. Heirloom tomatoes are my pride - Cherokee Purple, Brandywine, Green Zebra. Plus peppers, cucumbers, basil. CSA-style bag $25/week in season.",
     items: ["Heirloom tomatoes (lb)", "Mixed peppers", "Fresh basil", "Weekly veggie bag"],
     city: "Berea", county: "Madison", state: "KY", lat: 37.5687, lng: -84.2963,
@@ -143,7 +143,7 @@ const SEED_SELLERS = [
     city: "Paris", county: "Bourbon", state: "KY", lat: 38.2098, lng: -84.2530,
     contact: { phone: "(859) 555-0192", social: "facebook.com/goatmilksoapco" }, meet: "pickup", area: true,
     availability: "Restocks first Saturday each month", photoSeed: "goatsoap8", verified: true },
-  { d: "backyard-mushrooms", type: "product", category: "produce", title: "Backyard Mushrooms",
+  { d: "backyard-mushrooms", type: "product", farmstand: true, category: "produce", title: "Backyard Mushrooms",
     content: "Indoor gourmet mushrooms - pink and golden oyster year-round, lion's mane and shiitake by season. Picked the morning of pickup. Dried bags too.",
     items: ["Oyster mushrooms (half lb)", "Lion's mane", "Shiitake", "Dried mixed bag"],
     city: "Cincinnati", county: "Hamilton", state: "OH", lat: 39.1031, lng: -84.5120,

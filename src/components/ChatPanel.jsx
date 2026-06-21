@@ -131,7 +131,7 @@ function ChatPanel({ account, peer, dms, conversations, sellerByPub, syncing, on
           <div className={"border-t p-3 " + t.border}>
             <div className="flex items-end gap-2">
               <textarea
-                value={text} onChange={(e) => setText(e.target.value)} rows={1}
+                value={text} onChange={(e) => setText(e.target.value)} rows={2}
                 onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
                 placeholder="Write a message…"
                 className={"max-h-32 flex-1 resize-none rounded-xl border px-3.5 py-2.5 text-sm outline-none " + t.inputBg + " " + t.inputBorder + " " + t.text} style={FONT_BODY} />

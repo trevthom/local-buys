@@ -223,3 +223,30 @@ a small handshake count. Filter: sort="vouched" shows sellers you vouched for. M
 - New categories: product +Other Products; service +Personal & Lifestyle, Technical, Auto & Transport.
 - My Listings: removed '# listings you control'; added 'Refresh all' (Shell.refreshAllListings resets every owned listing's refreshedAt + republishes).
 - Scroll-to-top: Modal resets scrollTop=0 on open; AddListing step effect zeroes the .lb-scroll container; Shell scrolls window to top on mode/view change.
+
+## Farmstand designation (v2.6.2, branched from v2.6.1 — NO Tauri)
+- seller.farmstand bool. AddListingModal: 'This is a farmstand' checkbox shown ONLY for product type; persisted as farmstand (forced false for services).
+- SellerCard: emerald 'Farmstand' badge (Sprout icon) top-left of the image. SellerDetail: emerald 'Farmstand' badge (Sprout) leading the badge row.
+- Sort pill 'Farmstands' (Controls) shown only in product mode; Shell visible memo onlyFarmstands filters to s.farmstand and STAYS map-bounded (local). Switching to services resets sort off 'farmstands'.
+- Seeds sarahs-eggs, hilltop-heirlooms, backyard-mushrooms flagged farmstand:true.
+- NOTE: this is the web line off v2.6.1; v2.7.0 (Tauri packaging) is a separate branch and is NOT in here.
+
+## v2.8.0 (from v2.6.2; no Tauri)
+- AddListingModal step-2 banner: 'Drop a pin for an exact spot' -> 'Drop a pin to click on an exact spot'.
+- ChatPanel compose textarea rows 1 -> 2 (fits 2 lines; max-h-32 growth cap unchanged).
+- Versioning: web line jumped to 2.8.0 per user (2.7.0 = Tauri branch, still separate).
+
+## v2.8.1 — AND search + scope radios (from v2.8.0)
+- matchSearch now requires EVERY whitespace-separated token to match (AND, was OR). Haystack now includes
+  seller.state (plus title/content/items/city/county/category labels). Synonym groups still expand per token.
+- SmartSearch has two radios: 'In map view' (default) vs 'Everywhere' (scope prop + onScope). Shell holds
+  searchScope state ('view'|'global'). visible memo: bounds are bypassed only when searching AND scope=global
+  (favorites/vouched still global; farmstands + plain browse stay bounded). Header + empty-state are scope-aware.
+
+## v2.8.2 (from v2.8.1)
+- WhatIsNostrModal: headline -> 'Nostr is a decentralized network and social protocol for apps...'; removed the
+  leading 'Nostr is an open, decentralized social protocol.' sentence from the subtext.
+- Footer: 'What is Nostr?' moved into the right-side link row, to the LEFT of 'Issues / Feature Request', recolored
+  text-stone-400 to match. Login 'What is Nostr?' recolored emerald-600 -> stone-400.
+- 'Example listing' amber badge on seed listings: SellerCard (bottom-right of image) + SellerDetail (leads badge row).
+- SmartSearch: removed the focus dropdown (suggestions/'Try searching'); kept input + clear + scope radios.

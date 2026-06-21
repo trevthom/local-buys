@@ -1,7 +1,7 @@
 /* Seller detail + review form.
    Part of LOCAL BUYS. Organized for easy editing — see README.md. */
 import React, { useState } from "react";
-import { MapPin, Heart, Phone, Mail, Globe, X, Calendar, Repeat, Send, User, Truck, MessageCircle, EyeOff, Ban, Handshake, Check } from "lucide-react";
+import { MapPin, Heart, Phone, Mail, Globe, X, Calendar, Repeat, Send, User, Truck, MessageCircle, EyeOff, Ban, Handshake, Check, Sprout } from "lucide-react";
 import { LeafletMap } from "@/components/Map";
 import { Banner, Modal, PrimaryBtn, GhostBtn } from "@/components/ui";
 import { APP, catById } from "@/config";
@@ -86,6 +86,8 @@ function SellerDetail({ seller, reviews, account, userLoc, isFav, onFav, onClose
       <div className="p-5 sm:p-6">
         <div className="mb-3 flex items-start justify-between gap-3">
           <div className="flex flex-wrap items-center gap-2">
+            {seller.seed && <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2.5 py-1 text-xs font-bold text-white">Example listing</span>}
+            {seller.farmstand && <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2.5 py-1 text-xs font-bold text-white"><Sprout size={12} />Farmstand</span>}
             {cats.map((c) => <span key={c.id} className={"inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium " + t.chip}><c.icon size={12} />{c.label}</span>)}
             {seller.subscriptions && <span className="inline-flex items-center gap-1 rounded-full bg-violet-100 px-2.5 py-1 text-xs font-bold text-violet-800"><Repeat size={12} />Subscriptions</span>}
             {seller.bundles && <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">Bundles</span>}

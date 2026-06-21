@@ -43,15 +43,17 @@ function fmtPhone(input) {
 // ---- search + sort helpers ----
 function matchSearch(seller, query) {
   if (!query.trim()) return true;
-  const q = query.toLowerCase().trim();
   const catLabels = sellerCategories(seller).map((id) => (catById(id) ? catById(id).label : "")).join(" ");
   const hay = (seller.title + " " + seller.content + " " + (seller.items || []).join(" ") + " " +
-    seller.city + " " + seller.county + " " + catLabels).toLowerCase();
-  if (hay.includes(q)) return true;
-  const tokens = q.split(/\s+/);
-  return tokens.some((tok) => {
+    seller.city + " " + seller.county + " " + seller.state + " " + catLabels).toLowerCase();
+  const tokens = query.toLowerCase().trim().split(/\s+/);
+  // EVERY typed word must match (directly, or via a synonym group). So
+  // "eggs berea ky" only matches listings that contain all three.
+  return tokens.every((tok) => {
     if (hay.includes(tok)) return true;
-    for (const key in SYNONYMS) if (SYNONYMS[key].includes(tok)) return SYNONYMS[key].some((w) => hay.includes(w));
+    for (const key in SYNONYMS) {
+      if (SYNONYMS[key].includes(tok) && SYNONYMS[key].some((w) => hay.includes(w))) return true;
+    }
     return false;
   });
 }

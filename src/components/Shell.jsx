@@ -81,6 +81,7 @@ function Shell() {
   const [view, setView] = useState("grid");
   useEffect(() => { if (typeof window !== "undefined" && window.scrollTo) window.scrollTo(0, 0); }, [mode, view]);
   const [search, setSearch] = useState("");
+  const [searchScope, setSearchScope] = useState("view"); // "view" = within map bounds, "global" = everywhere
   const [filters, setFilters] = useState({ category: null, sort: "distance" });
   const [location, setLocation] = useState(DEFAULT_LOCATION);
   const [bounds, setBounds] = useState(null); // current map view; listings shown follow this
@@ -515,19 +516,23 @@ function Shell() {
     list = list.filter((s) => !blockedSet.has(s.pubkey) && !hiddenSet.has((s.pubkey || "") + ":" + s.d) && !listingExpired(s, nowSec));
     const onlyFavs = filters.sort === "favorites";
     const onlyVouched = filters.sort === "vouched";
+    const onlyFarmstands = filters.sort === "farmstands";
+    const searching = !!search.trim();
+    const searchGlobal = searching && searchScope === "global";
     if (filters.category) list = list.filter((s) => sellerCategories(s).includes(filters.category));
-    if (search.trim()) list = list.filter((s) => matchSearch(s, search));
+    if (searching) list = list.filter((s) => matchSearch(s, search));
     if (onlyFavs) list = list.filter((s) => favorites.includes(s.d));
     if (onlyVouched) list = list.filter((s) => myVouchSet.has(s.pubkey));
-    // only show what's inside the current map view — but when showing favorites or vouched,
-    // keep them all so they appear even if outside the current view
-    if (bounds && !onlyFavs && !onlyVouched) list = list.filter((s) => s.lat <= bounds.north && s.lat >= bounds.south && s.lng >= bounds.west && s.lng <= bounds.east);
+    if (onlyFarmstands) list = list.filter((s) => s.farmstand);
+    // only show what's inside the current map view — but favorites, vouched, and a
+    // GLOBAL-scoped search search everywhere. An "in map view" search stays bounded.
+    if (bounds && !onlyFavs && !onlyVouched && !searchGlobal) list = list.filter((s) => s.lat <= bounds.north && s.lat >= bounds.south && s.lng >= bounds.west && s.lng <= bounds.east);
     const withDist = list.map((s) => ({ s, dist: location ? milesBetween(location, { lat: s.lat, lng: s.lng }) : null }));
     if (filters.sort === "vouches") withDist.sort((a, b) => (vouchers[b.s.pubkey] || []).length - (vouchers[a.s.pubkey] || []).length);
     else if (filters.sort === "newest") withDist.sort((a, b) => (b.s.created_at || 0) - (a.s.created_at || 0));
     else withDist.sort((a, b) => (a.dist ?? 1e9) - (b.dist ?? 1e9)); // distance + favorites both sort nearest-first
     return withDist;
-  }, [sellers, mode, filters, search, location, reviews, bounds, favorites, blockedSet, hiddenSet, myVouchSet, vouchers]);
+  }, [sellers, mode, filters, search, searchScope, location, reviews, bounds, favorites, blockedSet, hiddenSet, myVouchSet, vouchers]);
 
   // map a pubkey -> a friendly listing title, for labelling conversations
   const sellerByPub = useMemo(() => {
@@ -625,7 +630,7 @@ function Shell() {
         {/* hero controls */}
         <div className="mb-5 flex flex-col gap-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <ModeToggle mode={mode} setMode={(m) => { setMode(m); setFilters({ ...filters, category: null }); }} />
+            <ModeToggle mode={mode} setMode={(m) => { setMode(m); setFilters((f) => ({ ...f, category: null, sort: (m !== "product" && f.sort === "farmstands") ? "distance" : f.sort })); }} />
             <div className="flex items-center gap-2">
               <div className={"inline-flex rounded-full border p-1 " + t.border + " " + t.panel}>
                 {[["grid", List], ["map", MapIcon]].map(([id, Icon]) => (
@@ -634,13 +639,13 @@ function Shell() {
               </div>
             </div>
           </div>
-          <SmartSearch value={search} onChange={setSearch} mode={mode} />
+          <SmartSearch value={search} onChange={setSearch} mode={mode} scope={searchScope} onScope={setSearchScope} />
           <FilterPanel filters={filters} setFilters={setFilters} mode={mode} reviews={reviews} />
         </div>
 
         {/* results */}
-        <div className={"mb-1 text-sm " + t.muted} style={FONT_BODY}>{visible.length} {mode === "product" ? "product" : "service"} listing{visible.length === 1 ? "" : "s"} {filters.sort === "favorites" ? "in your favorites" : filters.sort === "vouched" ? "you've vouched for" : "in view"}{search && " for \u201C" + search + "\u201D"}</div>
-        <p className={"mb-3 text-xs " + t.muted} style={FONT_BODY}>{filters.sort === "favorites" ? "Showing the listings you've favorited." : filters.sort === "vouched" ? "Showing sellers you've vouched for." : "Showing what's in the map below — pan or zoom to change the area."}</p>
+        <div className={"mb-1 text-sm " + t.muted} style={FONT_BODY}>{visible.length} {mode === "product" ? "product" : "service"} listing{visible.length === 1 ? "" : "s"} {search.trim() ? (searchScope === "global" ? "everywhere" : "in this area") : filters.sort === "favorites" ? "in your favorites" : filters.sort === "vouched" ? "you've vouched for" : filters.sort === "farmstands" ? "from farmstands in view" : "in view"}{search && " for \u201C" + search + "\u201D"}</div>
+        <p className={"mb-3 text-xs " + t.muted} style={FONT_BODY}>{filters.sort === "favorites" ? "Showing the listings you've favorited." : filters.sort === "vouched" ? "Showing sellers you've vouched for." : filters.sort === "farmstands" ? "Showing only farmstands in the map below — pan or zoom to change the area." : "Showing what's in the map below — pan or zoom to change the area."}</p>
 
         {/* the map always drives which listings are shown */}
         <div className={"overflow-hidden rounded-2xl border " + t.border}>
@@ -651,7 +656,7 @@ function Shell() {
           visible.length === 0 ? (
             <div className={"mt-4 rounded-2xl border border-dashed py-16 text-center " + t.border}>
               <Search size={32} className={"mx-auto mb-3 " + t.muted} />
-              <p className={"text-sm " + t.subtle} style={FONT_BODY}>{filters.sort === "favorites" ? "No favorites yet. Tap the heart on a listing to save it." : filters.sort === "vouched" ? "You haven't vouched for any sellers yet. Open a listing and tap Vouch." : "Nothing here in this part of the map. Zoom out or pan to see more."}</p>
+              <p className={"text-sm " + t.subtle} style={FONT_BODY}>{search.trim() ? (searchScope === "view" ? "No matches in this part of the map. Try the \u201CEverywhere\u201D option, or zoom out." : "No listings match all of those words.") : filters.sort === "favorites" ? "No favorites yet. Tap the heart on a listing to save it." : filters.sort === "vouched" ? "You haven't vouched for any sellers yet. Open a listing and tap Vouch." : filters.sort === "farmstands" ? "No farmstands in this part of the map. Zoom out or pan to see more." : "Nothing here in this part of the map. Zoom out or pan to see more."}</p>
             </div>
           ) : (
             <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -670,11 +675,11 @@ function Shell() {
             <div>
               <div className={"flex items-center gap-2 text-lg font-extrabold " + t.footerText} style={FONT_DISPLAY}><ShoppingBasket size={20} />{APP.name}</div>
               <p className="mt-1 max-w-md text-sm text-stone-400" style={FONT_BODY}>{account ? "Signed in as your Nostr identity. Listings & reviews are signed by your key." : "Browsing read-only. Sign in to post, message, or save listings."}</p>
-              <button onClick={() => setShowWhatIsNostr(true)} className="mt-1 text-sm text-emerald-400 underline" style={FONT_BODY}>What is Nostr?</button>
             </div>
             <div className="flex flex-col items-start gap-2 sm:items-end">
               {account && <NpubChip npub={account.npub} />}
               <div className="flex items-center gap-3">
+                <button onClick={() => setShowWhatIsNostr(true)} className="text-sm text-stone-400 underline" style={FONT_BODY}>What is Nostr?</button>
                 <button onClick={() => setShowIssues(true)} className="text-sm text-stone-400 underline" style={FONT_BODY}>Issues / Feature Request</button>
                 <button onClick={() => setShowAbout(true)} className="text-sm text-stone-400 underline" style={FONT_BODY}>How it works</button>
               </div>

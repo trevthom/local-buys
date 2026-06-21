@@ -25,31 +25,27 @@ function ModeToggle({ mode, setMode }) {
 }
 
 
-function SmartSearch({ value, onChange, mode }) {
+function SmartSearch({ value, onChange, mode, scope = "view", onScope }) {
   const { t } = useTheme();
-  const [focus, setFocus] = useState(false);
-  const suggestions = SUGGESTIONS[mode] || [];
   return (
     <div className="relative">
       <div className={"flex items-center gap-2.5 rounded-2xl border px-4 py-3 " + t.inputBg + " " + t.inputBorder}>
         <Search size={18} className={t.muted} />
         <input value={value} onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setFocus(true)} onBlur={() => setTimeout(() => setFocus(false), 150)}
           placeholder={mode === "product" ? "Search eggs, sourdough, honey..." : "Search mowing, tutor, handyman..."}
           className={"w-full bg-transparent text-sm outline-none " + t.text} style={FONT_BODY} />
         {value && <button onClick={() => onChange("")} className={t.muted}><X size={16} /></button>}
       </div>
-      {focus && !value && (
-        <div className={"absolute z-20 mt-2 w-full rounded-2xl border p-2 shadow-lg " + t.panel + " " + t.border}>
-          <div className={"px-2 py-1 text-xs font-semibold uppercase tracking-wide " + t.muted} style={FONT_BODY}>Try searching</div>
-          {suggestions.map((s) => (
-            <button key={s} onMouseDown={() => onChange(s)}
-              className={"flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm hover:opacity-70 " + t.text} style={FONT_BODY}>
-              <Search size={13} className={t.muted} />{s}
-            </button>
-          ))}
-        </div>
-      )}
+      {/* search scope: only the visible map area, or every listing */}
+      <div className="mt-2 flex items-center gap-4 px-1">
+        <span className={"text-xs font-semibold uppercase tracking-wide " + t.muted} style={FONT_BODY}>Search</span>
+        {[["view", "In map view"], ["global", "Everywhere"]].map(([id, label]) => (
+          <label key={id} className={"flex cursor-pointer items-center gap-1.5 text-sm " + t.text} style={FONT_BODY}>
+            <input type="radio" name="search-scope" checked={scope === id} onChange={() => onScope && onScope(id)} className="h-3.5 w-3.5 accent-emerald-700" />
+            {label}
+          </label>
+        ))}
+      </div>
     </div>
   );
 }
@@ -97,7 +93,7 @@ function FilterPanel({ filters, setFilters, mode, reviews }) {
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <span className={"text-xs font-semibold uppercase tracking-wide " + t.muted} style={FONT_BODY}>Sort</span>
-        {[["distance", "Nearest"], ["vouches", "Most vouches"], ["newest", "Newest"], ["favorites", "Favorites"], ["vouched", "Your Vouches"]].map(([id, label]) => (
+        {[["distance", "Nearest"], ["vouches", "Most vouches"], ["newest", "Newest"], ["favorites", "Favorites"], ["vouched", "Your Vouches"], ...(mode === "product" ? [["farmstands", "Farmstands"]] : [])].map(([id, label]) => (
           <Pill key={id} active={filters.sort === id} onClick={() => setFilters({ ...filters, sort: id })}>{label}</Pill>
         ))}
       </div>

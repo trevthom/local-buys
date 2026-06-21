@@ -78,7 +78,7 @@ function AuthScreen({ onAuthed, onReadOnly }) {
                   <Banner tone="info">
                     A Nostr account is just a key pair you control — no email, no password, no company in the middle. We'll generate one in your browser.
                   </Banner>
-                  <div className="text-center"><button onClick={() => setShowNostr(true)} className="text-sm text-emerald-600 underline" style={FONT_BODY}>What is Nostr?</button></div>
+                  <div className="text-center"><button onClick={() => setShowNostr(true)} className="text-sm text-stone-400 underline" style={FONT_BODY}>What is Nostr?</button></div>
                   <PrimaryBtn full icon={Key} onClick={generate}>Generate my keys</PrimaryBtn>
                 </>
               ) : (

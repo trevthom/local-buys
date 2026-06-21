@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* App-specific styles (scrollbars, dark map tiles, popup animation) */
+html, body, #root { height: 100%; }
+body { margin: 0; }
+
+.lb-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.lb-scroll::-webkit-scrollbar-thumb { background: rgba(120,113,108,.4); border-radius: 8px; }
+
+.leaflet-container { font-family: 'Inter', sans-serif; }
+.lb-dark .leaflet-tile { filter: invert(1) hue-rotate(180deg) brightness(.95) contrast(.9); }
+.lb-dark .leaflet-container { background: #1c1917; }
+
+@keyframes lbpop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+.lb-pop { animation: lbpop .25s ease both; }
